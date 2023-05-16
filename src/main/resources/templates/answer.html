@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Java2 Project Demo</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<h1>Number of Answers (15 points)</h1>
+
+<h2>What percentage of questions don't have any answer?</h2>
+<p>Percentage without answer: <span id="percentageWithoutAnswer"></span>%</p>
+
+<h2>What is the average and maximum number of answers?</h2>
+<p>Average answers: <span id="averageAnswers"></span></p>
+<p>Maximum answers: <span id="maximumAnswers"></span></p>
+
+<h2>What is the distribution of the number of answers?</h2>
+<canvas id="answersDistributionChart"></canvas>
+
+<script src="/js/answer.js"></script>
+<script>
+  const percentageWithoutAnswer = JSON.parse(`/*[[${percentageWithoutAnswer}]]*/`);
+  const averageAnswers = JSON.parse(`/*[[${averageAnswers}]]*/`);
+  const maximumAnswers = JSON.parse(`/*[[${maximumAnswers}]]*/`);
+  const answersDistribution = JSON.parse(`/*[[${answersDistribution}]]*/`);
+
+  document.getElementById("percentageWithoutAnswer").textContent = percentageWithoutAnswer;
+  document.getElementById("averageAnswers").textContent = averageAnswers;
+  document.getElementById("maximumAnswers").textContent = maximumAnswers;
+
+  const distributionLabels = answersDistribution.map(data => data.answerCount);
+  const distributionData = answersDistribution.map(data => data.questionCount);
+
+  const ctx = document.getElementById("answersDistributionChart").getContext("2d");
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: distributionLabels,
+      datasets: [{
+        label: "Number of Questions",
+        data: distributionData,
+        backgroundColor: "rgba(75, 192, 192, 0.2)",
+        borderColor: "rgba(75, 192, 192, 1)",
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          precision: 0
+        }
+      }
+    }
+  });
+</script>
+</body>
+</html>

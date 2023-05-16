@@ -50,32 +50,107 @@ public class Question {
     this.title = title;
   }
 
-  static class Owner {
+  public List<String> getTags() {
+    return tags;
+  }
 
-    @SerializedName("account_id")
-    private int accountId;
-    @SerializedName("reputation")
-    private int reputation;
-    @SerializedName("user_id")
-    private int userId;
-    @SerializedName("user_type")
-    private String userType;
-    @SerializedName("profile_image")
-    private String profileImage;
-    @SerializedName("display_name")
-    private String displayName;
-    @SerializedName("link")
-    private String link;
+  public void setTags(List<String> tags) {
+    this.tags = tags;
+  }
 
-    public Owner(int accountId, int reputation, int userId, String userType, String profileImage,
-        String displayName, String link) {
-      this.accountId = accountId;
-      this.reputation = reputation;
-      this.userId = userId;
-      this.userType = userType;
-      this.profileImage = profileImage;
-      this.displayName = displayName;
-      this.link = link;
-    }
+  public Owner getOwner() {
+    return owner;
+  }
+
+  public void setOwner(Owner owner) {
+    this.owner = owner;
+  }
+
+  public boolean isAnswered() {
+    return isAnswered;
+  }
+
+  public void setAnswered(boolean answered) {
+    isAnswered = answered;
+  }
+
+  public int getViewCount() {
+    return viewCount;
+  }
+
+  public void setViewCount(int viewCount) {
+    this.viewCount = viewCount;
+  }
+
+  public int getAnswerCount() {
+    return answerCount;
+  }
+
+  public void setAnswerCount(int answerCount) {
+    this.answerCount = answerCount;
+  }
+
+  public int getScore() {
+    return score;
+  }
+
+  public void setScore(int score) {
+    this.score = score;
+  }
+
+  public long getLastActivityDate() {
+    return lastActivityDate;
+  }
+
+  public void setLastActivityDate(long lastActivityDate) {
+    this.lastActivityDate = lastActivityDate;
+  }
+
+  public long getCreationDate() {
+    return creationDate;
+  }
+
+  public void setCreationDate(long creationDate) {
+    this.creationDate = creationDate;
+  }
+
+  public long getLastEditDate() {
+    return lastEditDate;
+  }
+
+  public void setLastEditDate(long lastEditDate) {
+    this.lastEditDate = lastEditDate;
+  }
+
+  public int getId() {
+    return Id;
+  }
+
+  public void setId(int id) {
+    Id = id;
+  }
+
+  public String getContentLicense() {
+    return contentLicense;
+  }
+
+  public void setContentLicense(String contentLicense) {
+    this.contentLicense = contentLicense;
+  }
+
+  public String getLink() {
+    return link;
+  }
+
+  public void setLink(String link) {
+    this.link = link;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
   }
 }

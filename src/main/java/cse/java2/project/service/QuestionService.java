@@ -29,7 +29,6 @@ public class QuestionService {
       Type questionListType = new TypeToken<List<Question>>() {
       }.getType();
       List<Question> questions = new Gson().fromJson(jsonStrings, questionListType);
-      //从json文件中获取从网上爬取的2500个问题，将其保存在本地
       questionRepository.saveAllAndFlush(questions);
     } catch (IOException e) {
       throw new RuntimeException(e);
