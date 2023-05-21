@@ -16,11 +16,15 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -122,6 +126,81 @@ public class QuestionAndAnswerService {
     } else {
       return "#6: >30days";
     }
+  }
+
+  public long getPercentageOfAnswerUpvote() {
+    return answerRepository.countQuestionsWithMoreUpvote();
+  }
+
+  public long getQuestionCount() {
+    return questionRepository.count();
+  }
+
+  public List<Map<String, Object>> getTopTenTagsWithCount() {
+    List<Object[]> tagCounts = questionRepository.getTagCount();
+
+    // 对标签出现次数进行排序（按降序）
+    tagCounts.sort((a, b) -> ((Long) b[1]).compareTo((Long) a[1]));
+
+    // 获取前十名标签及其出现次数
+    List<Map<String, Object>> topTenTagsWithCount = tagCounts.stream()
+        .limit(10)
+        .map(tagCount -> {
+          Map<String, Object> tagData = new HashMap<>();
+          tagData.put("tag", tagCount[0]);
+          tagData.put("count", tagCount[1]);
+          return tagData;
+        })
+        .collect(Collectors.toList());
+
+    return topTenTagsWithCount;
+  }
+
+
+  public Map<String, Integer> getTopTenTagsWithUpvote() {
+    List<Question> questions = questionRepository.findAll();
+    HashMap<String, Integer> map = new HashMap<>();
+
+    for (Question question : questions) {
+      List<String> tags = questionRepository.getTagsByQuestionId(question.getId());
+      tags.sort(String::compareTo);
+      String tag = tags.toString();
+      System.out.println(tag);
+
+      map.put(tag, map.getOrDefault(tag, 0) + question.getUpVoteCount());
+
+    }
+
+    Map<String, Integer> topTags = map.entrySet()
+        .stream()
+        .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+        .limit(10)
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+    return topTags;
+  }
+
+  public Map<String, Integer> getTopTenTagsWithView() {
+    List<Question> questions = questionRepository.findAll();
+    HashMap<String, Integer> map = new HashMap<>();
+
+    for (Question question : questions) {
+      List<String> tags = questionRepository.getTagsByQuestionId(question.getId());
+      tags.sort(String::compareTo);
+      String tag = tags.toString();
+      System.out.println(tag);
+
+      map.put(tag, map.getOrDefault(tag, 0) + question.getViewCount());
+
+    }
+
+    Map<String, Integer> topTags = map.entrySet()
+        .stream()
+        .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+        .limit(10)
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+    return topTags;
   }
 
 

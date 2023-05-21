@@ -65,7 +65,9 @@ public class Question {
   @Column(name = "title", columnDefinition = "text")
   @SerializedName("title")
   private String title;
-
+  @Column(name = "up_vote_count")
+  @SerializedName("up_vote_count")
+  private int upVoteCount;
 
   @ElementCollection
   @CollectionTable(name = "question_tags", joinColumns = @JoinColumn(name = "question_id"))
@@ -77,6 +79,14 @@ public class Question {
 
   // Convert tagNames to Tag objects after deserialization
 
+
+  public int getUpVoteCount() {
+    return upVoteCount;
+  }
+
+  public void setUpVoteCount(int upVoteCount) {
+    this.upVoteCount = upVoteCount;
+  }
 
   public int getId() {
     return id;

@@ -17,7 +17,7 @@ public class getQuestions {
   public static void main(String[] args) throws IOException {
     OkHttpClient client = new OkHttpClient();
 
-    String baseUrl = "https://api.stackexchange.com/2.3/questions?order=desc&sort=activity&site=stackoverflow&tagged=java&pagesize=100&page=%d";
+    String baseUrl = "https://api.stackexchange.com/2.3/questions?page=%d&pagesize=100&order=desc&sort=activity&tagged=java&site=stackoverflow&filter=!-L(Ygem0meScMk5U8(qnhwMZzZdrn8A-6";
 
     int currentPage = 1;
     int totalQuestions = 0;

@@ -44,12 +44,24 @@
 <h2>What is the distribution of question resolution time?</h2>
 <div id="answerTimeDistributionChart" class="chart-container"></div>
 
+<h2>What percentage of questions have non-accepted answers that have received more upvotes than the
+  accepted answers?</h2>
+<div id="PercentageOfAnswerUpvoteChart" class="chart-container"></div>
+
+<h2>Top 10 Tags exist with "java!"</h2>
+<div id="tagCountChart" class="chart-container"></div>
+
+<h2>Top 10 Tags Combinations with most upvote"</h2>
+<div id="topTagsWithUpvoteChart" class="chart-container"></div>
+
+<h2>Top 10 Tags Combinations with most view"</h2>
+<div id="topTagsWithViewChart" class="chart-container"></div>
+
 <script th:inline="javascript">
   // 获取后端传递过来的数据
 
   var averageNumberOfAnswers = /*[[${averageNumberOfAnswers}]]*/ 0;
   var maximumNumberOfAnswers = /*[[${maximumNumberOfAnswers}]]*/ 0;
-
 
   // 创建饼状图展示未回答问题的百分比
   var percentageOfUnansweredQuestions = /*[[${percentageOfUnansweredQuestions}]]*/ 0;
@@ -162,7 +174,6 @@
       });
   QuestionWithAcceptedAnswerChart.render();
 
-
   // 创建饼状图展示解决时间的分布
   var distributionOfAnswerTime = /*[[${distributionOfAnswerTime}]]*/ {};
 
@@ -174,43 +185,165 @@
   var sortedTimeRanges = timeRanges.sort();
 
   // 根据排序后的时间范围重新排列数量
-  var sortedTimeRangeCounts = sortedTimeRanges.map(function(range) {
+  var sortedTimeRangeCounts = sortedTimeRanges.map(function (range) {
     return distributionOfAnswerTime[range];
   });
 
   // 创建饼状图展示问题解决时间的分布
-  var answerTimeDistributionChart = new ApexCharts(document.querySelector("#answerTimeDistributionChart"), {
-    series: sortedTimeRangeCounts,
-    labels: sortedTimeRanges,
-    chart: {
-      type: "donut",
-      height: 300,
-    },
-    plotOptions: {
-      pie: {
-        donut: {
-          size: "80%",
-        },
-      },
-    },
-    responsive: [{
-      breakpoint: 480,
-      options: {
+  var answerTimeDistributionChart = new ApexCharts(
+      document.querySelector("#answerTimeDistributionChart"), {
+        series: sortedTimeRangeCounts,
+        labels: sortedTimeRanges,
         chart: {
-          width: 200,
+          type: "donut",
+          height: 300,
         },
-        legend: {
-          position: "bottom",
+        plotOptions: {
+          pie: {
+            donut: {
+              size: "80%",
+            },
+          },
         },
-      },
-    }],
-  });
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200,
+            },
+            legend: {
+              position: "bottom",
+            },
+          },
+        }],
+      });
 
   answerTimeDistributionChart.render();
 
+  // What percentage of questions have accepted answers
+  var PercentageOfAnswerUpvote = /*[[${PercentageOfAnswerUpvote}]]*/ 0;
+  var questionCount = /*[[${questionCount}]]*/ 0;
+  var PercentageOfAnswerUpvoteChart = new ApexCharts(
+      document.querySelector("#PercentageOfAnswerUpvoteChart"), {
+        series: [PercentageOfAnswerUpvote,
+          questionCount - PercentageOfAnswerUpvote],
+        labels: ["Unaccepted answer have more upvote", "Accepted answer have more or equal upvote"],
+        chart: {
+          type: "donut",
+          height: 300
+        },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: "80%"
+            }
+          }
+        },
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: "bottom"
+            }
+          }
+        }]
+      });
+  PercentageOfAnswerUpvoteChart.render();
 
+  var tagCounts = /*[[${topTenTagsWithCount}]]*/ [];
 
+  // 提取标签和出现次数的数据
+  var labels = tagCounts.map(function (tagData) {
+    return tagData.tag;
+  });
 
+  var data = tagCounts.map(function (tagData) {
+    return tagData.count;
+  });
+
+  // 创建柱状图展示出现最多的标签及其出现次数
+  var tagCountChart = new ApexCharts(document.querySelector("#tagCountChart"), {
+    series: [{
+      name: "Tag Count",
+      data: data
+    }],
+    chart: {
+      type: "bar",
+      height: 300,
+      width: 600
+    },
+    xaxis: {
+      categories: labels
+    }
+  });
+  tagCountChart.render();
+
+  var topTagsWithUpvote = /*[[${topTagsWithUpvote}]]*/ {};
+
+  var tagCombination = Object.keys(topTagsWithUpvote);
+  var voteCount = Object.values(topTagsWithUpvote);
+
+  var topTagsWithUpvoteChart = new ApexCharts(document.querySelector("#topTagsWithUpvoteChart"),
+      {
+        series: [{
+          name: 'Upvotes',
+          data: voteCount
+        }],
+        chart: {
+          type: 'bar',
+          height: 300
+        },
+        xaxis: {
+          categories: tagCombination
+        },
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }]
+      });
+  topTagsWithUpvoteChart.render();
+
+  var topTagsWithView = /*[[${topTagsWithView}]]*/ {};
+
+  var tagCombination2 = Object.keys(topTagsWithView);
+  var voteCount2 = Object.values(topTagsWithView);
+
+  var topTagsWithViewChart = new ApexCharts(document.querySelector("#topTagsWithViewChart"),
+      {
+        series: [{
+          name: 'Upvotes',
+          data: voteCount2
+        }],
+        chart: {
+          type: 'bar',
+          height: 300
+        },
+        xaxis: {
+          categories: tagCombination2
+        },
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }]
+      });
+  topTagsWithViewChart.render();
 
 </script>
 </body>

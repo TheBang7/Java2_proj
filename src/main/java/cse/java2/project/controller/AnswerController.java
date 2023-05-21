@@ -1,6 +1,9 @@
 package cse.java2.project.controller;
 
 import cse.java2.project.service.QuestionAndAnswerService;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Controller;
@@ -16,7 +19,7 @@ public class AnswerController {
     this.questionService = questionService;
   }
 
-  @GetMapping("/answer")
+  @GetMapping({"/", "/answer"})
   public String answer(Model model) {
 
     double percentageOfUnansweredQuestions = questionService.getPercentageOfUnansweredQuestions();
@@ -40,7 +43,24 @@ public class AnswerController {
 //      System.out.println(s + " " + distributionOfAnswerTime.get(s));
 //    }
 
+    double PercentageOfAnswerUpvote = questionService.getPercentageOfAnswerUpvote();
+    model.addAttribute("PercentageOfAnswerUpvote", PercentageOfAnswerUpvote);
+
+    long questionCount = questionService.getQuestionCount();
+    model.addAttribute("questionCount", questionCount);
+
+    List<Map<String, Object>> topTenTagsWithCount = questionService.getTopTenTagsWithCount();
+    model.addAttribute("topTenTagsWithCount", topTenTagsWithCount);
+
+    Map<String, Integer> topTagsWithUpvote = questionService.getTopTenTagsWithUpvote();
+    model.addAttribute("topTagsWithUpvote", topTagsWithUpvote);
+
+    Map<String, Integer> topTagsWithView = questionService.getTopTenTagsWithView();
+    model.addAttribute("topTagsWithView", topTagsWithView);
+
     return "answer";
+
+
   }
 
 }

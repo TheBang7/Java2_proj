@@ -15,4 +15,10 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
   @Query("SELECT a.creationDate FROM Answer a WHERE a.isAccepted = true AND a.questionId = :id")
   Long getCreationDateOfAcceptedAnswer(@Param("id") Integer id);
 
+  @Query("SELECT COUNT(DISTINCT a.questionId) FROM Answer a WHERE a.isAccepted = false AND a.upVoteCount > (SELECT MAX(a2.upVoteCount) FROM Answer a2 WHERE a2.questionId = a.questionId AND a2.isAccepted = true)")
+  int countQuestionsWithMoreUpvote();
+
+
+  @Query("SELECT COUNT(a) FROM Answer a")
+  long countAnswers();
 }

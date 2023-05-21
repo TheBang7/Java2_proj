@@ -54,6 +54,15 @@ public class Answer {
   @SerializedName("question_id")
   private int questionId;
 
+  @ElementCollection
+  @CollectionTable(name = "answer_tags", joinColumns = @JoinColumn(name = "answer_id"))
+  @Column(name = "tag")
+  @SerializedName("tags")
+  private List<String> tags;
+
+  @Column(name = "up_vote_count")
+  @SerializedName("up_vote_count")
+  private int upVoteCount;
   // Constructors, getters, and setters
 
   // Convert ownerId to Owner object after deserialization

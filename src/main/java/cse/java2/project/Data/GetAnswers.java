@@ -67,7 +67,7 @@ public class GetAnswers {
 
       do {
         String url = String.format(
-            "https://api.stackexchange.com/2.3/questions/%s/answers?order=desc&sort=activity&site=stackoverflow&pagesize=30&page=%d",
+            "https://api.stackexchange.com/2.3/questions/%s/answers?order=desc&sort=activity&site=stackoverflow&pagesize=30&page=%d&filter=!BAW8brXJUpzFEVHoryHl6_pnja*SqA",
             questionIds, pageNumber);
 
         Request request = new Request.Builder().url(url).build();
