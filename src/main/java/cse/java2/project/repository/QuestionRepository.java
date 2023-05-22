@@ -43,9 +43,14 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
   @Query("SELECT qt FROM Question q JOIN q.tags qt WHERE q.id = :questionId")
   List<String> getTagsByQuestionId(@Param("questionId") int questionId);
 
-
-
-
-
+  @Query("SELECT q FROM Question q WHERE (:isAnswered IS NULL OR q.isAnswered = :isAnswered) AND (:id IS NULL OR q.id = :id)")
+  List<Question> getFilteredQuestions(@Param("isAnswered") Boolean isAnswered,
+      @Param("id") Integer id);
 
 }
+
+
+
+
+
+

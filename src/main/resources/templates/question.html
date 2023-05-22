@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Answer Page</title>
+  <!-- 引入需要的图表库 -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.27.3/dist/apexcharts.min.js"></script>
+  <style>
+    .chart-container {
+      width: 400px;
+      height: 400px;
+      margin: auto;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    #distributionChart {
+      margin: auto;
+    }
+
+    #answerTimeDistributionChart {
+      margin: auto;
+    }
+  </style>
+
+</head>
+<body>
+<h1>Some Introduction to StackOverFlow —— questions</h1>
+
+<h2>What percentage of questions don't have any answer?</h2>
+<div id="unansweredChart" class="chart-container"></div>
+
+<h2>What is the average and maximum number of answers?</h2>
+<div id="averageMaxChart" class="chart-container"></div>
+
+<h2>What is the distribution of the number of answers?</h2>
+<div id="distributionChart" class="chart-container"></div>
+
+<h2>What percentage of questions have accepted answers?</h2>
+<div id="QuestionWithAcceptedAnswerChart" class="chart-container"></div>
+
+<h2>What is the distribution of question resolution time?</h2>
+<div id="answerTimeDistributionChart" class="chart-container"></div>
+
+<h2>What percentage of questions have non-accepted answers that have received more upvotes than the
+  accepted answers?</h2>
+<div id="PercentageOfAnswerUpvoteChart" class="chart-container"></div>
+
+<script th:inline="javascript">
+  // 获取后端传递过来的数据
+
+  var averageNumberOfAnswers = /*[[${averageNumberOfAnswers}]]*/ 0;
+  var maximumNumberOfAnswers = /*[[${maximumNumberOfAnswers}]]*/ 0;
+
+  // 创建饼状图展示未回答问题的百分比
+  var percentageOfUnansweredQuestions = /*[[${percentageOfUnansweredQuestions}]]*/ 0;
+  var unansweredChart = new ApexCharts(document.querySelector("#unansweredChart"), {
+    series: [percentageOfUnansweredQuestions * 100, 100 - percentageOfUnansweredQuestions * 100],
+    labels: ["Unanswered", "Answered"],
+    chart: {
+      type: "donut",
+      height: 300
+    },
+    plotOptions: {
+      pie: {
+        donut: {
+          size: "80%"
+        }
+      }
+    },
+    responsive: [{
+      breakpoint: 480,
+      options: {
+        chart: {
+          width: 200
+        },
+        legend: {
+          position: "bottom"
+        }
+      }
+    }]
+  });
+  unansweredChart.render();
+
+  // 创建柱状图展示平均和最大回答数量
+  var averageMaxChart = new ApexCharts(document.querySelector("#averageMaxChart"), {
+    series: [{
+      name: "Average",
+      data: [averageNumberOfAnswers]
+    }, {
+      name: "Maximum",
+      data: [maximumNumberOfAnswers]
+    }],
+    chart: {
+      type: "bar",
+      height: 300
+    },
+    xaxis: {
+      categories: ["Average and Maximum"]
+    }
+  });
+  averageMaxChart.render();
+
+  // 创建柱状图展示回答数量的分布
+  var distributionOfAnswerCounts = /*[[${distributionOfAnswerCounts}]]*/ [];
+
+  console.log("distributionOfAnswerCounts:", distributionOfAnswerCounts); // 调试信息
+
+  // 提取回答选项和数量的数据
+  var labels = distributionOfAnswerCounts.map(function (item) {
+    return item[0];
+  });
+  var data = distributionOfAnswerCounts.map(function (item) {
+    return item[1];
+  });
+
+  // 创建柱状图展示回答数量的分布
+  var distributionChart = new ApexCharts(document.querySelector("#distributionChart"), {
+    series: [{
+      name: "Questions that have this number of answers",
+      data: data
+    }],
+    chart: {
+      type: "bar",
+      height: 300,
+      width: 600
+    },
+    xaxis: {
+      categories: labels
+    }
+  });
+  distributionChart.render();
+
+  // What percentage of questions have accepted answers
+  var percentageOfQuestionWithAcceptedAnswer = /*[[${percentageOfQuestionWithAcceptedAnswer}]]*/ 0;
+  var QuestionWithAcceptedAnswerChart = new ApexCharts(
+      document.querySelector("#QuestionWithAcceptedAnswerChart"), {
+        series: [percentageOfQuestionWithAcceptedAnswer * 100,
+          100 - percentageOfQuestionWithAcceptedAnswer * 100],
+        labels: ["Questions with accepted answers", "Questions without accepted answers"],
+        chart: {
+          type: "donut",
+          height: 300
+        },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: "80%"
+            }
+          }
+        },
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: "bottom"
+            }
+          }
+        }]
+      });
+  QuestionWithAcceptedAnswerChart.render();
+
+  // 创建饼状图展示解决时间的分布
+  var distributionOfAnswerTime = /*[[${distributionOfAnswerTime}]]*/ {};
+
+  // 提取时间范围和数量的数据
+  var timeRanges = Object.keys(distributionOfAnswerTime);
+  var timeRangeCounts = Object.values(distributionOfAnswerTime);
+
+  // 对时间范围进行排序
+  var sortedTimeRanges = timeRanges.sort();
+
+  // 根据排序后的时间范围重新排列数量
+  var sortedTimeRangeCounts = sortedTimeRanges.map(function (range) {
+    return distributionOfAnswerTime[range];
+  });
+
+  // 创建饼状图展示问题解决时间的分布
+  var answerTimeDistributionChart = new ApexCharts(
+      document.querySelector("#answerTimeDistributionChart"), {
+        series: sortedTimeRangeCounts,
+        labels: sortedTimeRanges,
+        chart: {
+          type: "donut",
+          height: 300,
+        },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: "80%",
+            },
+          },
+        },
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200,
+            },
+            legend: {
+              position: "bottom",
+            },
+          },
+        }],
+      });
+
+  answerTimeDistributionChart.render();
+
+  // What percentage of questions have accepted answers
+  var PercentageOfAnswerUpvote = /*[[${PercentageOfAnswerUpvote}]]*/ 0;
+  var questionCount = /*[[${questionCount}]]*/ 0;
+  var PercentageOfAnswerUpvoteChart = new ApexCharts(
+      document.querySelector("#PercentageOfAnswerUpvoteChart"), {
+        series: [PercentageOfAnswerUpvote,
+          questionCount - PercentageOfAnswerUpvote],
+        labels: ["Unaccepted answer have more upvote", "Accepted answer have more or equal upvote"],
+        chart: {
+          type: "donut",
+          height: 300
+        },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: "80%"
+            }
+          }
+        },
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: "bottom"
+            }
+          }
+        }]
+      });
+  PercentageOfAnswerUpvoteChart.render();
+
+
+</script>
+</body>
+
+</html>

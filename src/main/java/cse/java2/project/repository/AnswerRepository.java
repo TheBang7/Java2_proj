@@ -21,4 +21,10 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
 
   @Query("SELECT COUNT(a) FROM Answer a")
   long countAnswers();
+
+  @Query("SELECT a FROM Answer a WHERE (:isAccepted IS NULL OR a.isAccepted = :isAccepted) AND (:id IS NULL OR a.questionId = :id)")
+  List<Answer> getFilteredAnswers(@Param("isAccepted") Boolean isAccepted,
+      @Param("id") Integer id);
+
+
 }

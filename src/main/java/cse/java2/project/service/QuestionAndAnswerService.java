@@ -4,8 +4,11 @@ package cse.java2.project.service;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import cse.java2.project.model.Answer;
+import cse.java2.project.model.Comment;
+import cse.java2.project.model.Owner;
 import cse.java2.project.model.Question;
 import cse.java2.project.repository.AnswerRepository;
+import cse.java2.project.repository.CommentRepository;
 import cse.java2.project.repository.QuestionRepository;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -15,16 +18,14 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,12 +34,14 @@ public class QuestionAndAnswerService {
 
   private final QuestionRepository questionRepository;
   private final AnswerRepository answerRepository;
+  private final CommentRepository commentRepository;
 
   @Autowired
   public QuestionAndAnswerService(QuestionRepository questionRepository,
-      AnswerRepository answerRepository) {
+      AnswerRepository answerRepository, CommentRepository commentRepository) {
     this.questionRepository = questionRepository;
     this.answerRepository = answerRepository;
+    this.commentRepository = commentRepository;
 
   }
 
@@ -55,6 +58,18 @@ public class QuestionAndAnswerService {
       }.getType();
       List<Answer> answers = new Gson().fromJson(jsonStrings2, answerListType);
       answerRepository.saveAll(answers);
+
+      String jsonStrings3 = Files.readString(Path.of("comments.json"));
+      Type commentListType = new TypeToken<List<Comment>>() {
+      }.getType();
+      List<Comment> comments = new Gson().fromJson(jsonStrings3, commentListType);
+      commentRepository.saveAll(comments);
+
+      String jsonStrings4 = Files.readString(Path.of("AnswerComments.json"));
+      Type commentListType2 = new TypeToken<List<Comment>>() {
+      }.getType();
+      List<Comment> comments2 = new Gson().fromJson(jsonStrings4, commentListType2);
+      commentRepository.saveAll(comments2);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -157,7 +172,7 @@ public class QuestionAndAnswerService {
   }
 
 
-  public Map<String, Integer> getTopTenTagsWithUpvote() {
+  public List<Object[]> getTopTenTagsWithUpvote() {
     List<Question> questions = questionRepository.findAll();
     HashMap<String, Integer> map = new HashMap<>();
 
@@ -168,19 +183,19 @@ public class QuestionAndAnswerService {
       System.out.println(tag);
 
       map.put(tag, map.getOrDefault(tag, 0) + question.getUpVoteCount());
-
     }
 
-    Map<String, Integer> topTags = map.entrySet()
+    List<Object[]> topTags = map.entrySet()
         .stream()
         .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
         .limit(10)
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        .map(entry -> new Object[]{entry.getKey(), entry.getValue()})
+        .collect(Collectors.toList());
 
     return topTags;
   }
 
-  public Map<String, Integer> getTopTenTagsWithView() {
+  public List<Object[]> getTopTenTagsWithView() {
     List<Question> questions = questionRepository.findAll();
     HashMap<String, Integer> map = new HashMap<>();
 
@@ -191,16 +206,138 @@ public class QuestionAndAnswerService {
       System.out.println(tag);
 
       map.put(tag, map.getOrDefault(tag, 0) + question.getViewCount());
-
     }
 
-    Map<String, Integer> topTags = map.entrySet()
+    List<Object[]> topTags = map.entrySet()
         .stream()
         .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
         .limit(10)
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        .map(entry -> new Object[]{entry.getKey(), entry.getValue()})
+        .collect(Collectors.toList());
 
     return topTags;
+  }
+
+  public HashMap<String, Long> userTime() {
+    HashMap<String, Long> userTime = new HashMap<>();
+    List<Question> questions = questionRepository.findAll();
+    List<Answer> answers = answerRepository.findAll();
+    for (Question q : questions) {
+      Owner owner = q.getOwner();
+      String s = owner.getDisplayName() + "(" + owner.getUserId() + ")";
+      userTime.put(s, userTime.getOrDefault(s, 0L) + 1);
+    }
+    for (Answer a : answers) {
+      Owner owner = a.getOwner();
+      String s = owner.getDisplayName() + "(" + owner.getUserId() + ")";
+      userTime.put(s, userTime.getOrDefault(s, 0L) + 1);
+    }
+
+    List<Comment> comments = commentRepository.findAll();
+    for (Comment c : comments) {
+      Owner owner = c.getOwner();
+      String s = owner.getDisplayName() + "(" + owner.getUserId() + ")";
+      userTime.put(s, userTime.getOrDefault(s, 0L) + 1);
+    }
+
+    return userTime;
+  }
+
+  public HashMap<String, Long> userDistribution() {
+    HashMap<String, Long> userTIme = this.userTime();
+    HashMap<String, Long> userDistribution = new HashMap<>();
+    for (long v : userTIme.values()) {
+      String s = getUserRange(v);
+      userDistribution.put(s, userDistribution.getOrDefault(s, 0L) + 1);
+    }
+    return userDistribution;
+  }
+
+  public List<Object[]> TopUsers() {
+    HashMap<String, Long> userTime = this.userTime();
+
+    // 使用HashMap的entrySet创建流，然后对流中的元素按照value进行排序
+    List<Object[]> topUsers = getTopUsers(userTime);
+
+    return topUsers;
+  }
+
+  public List<Object[]> TopUsersWithMostAnswers() {
+
+    HashMap<String, Long> userTime = new HashMap<>();
+
+    List<Answer> answers = answerRepository.findAll();
+
+    for (Answer a : answers) {
+      Owner owner = a.getOwner();
+      String s = owner.getDisplayName() + "(" + owner.getUserId() + ")";
+      userTime.put(s, userTime.getOrDefault(s, 0L) + 1);
+    }
+
+    // 使用HashMap的entrySet创建流，然后对流中的元素按照value进行排序
+    List<Object[]> topUsers = getTopUsers(userTime);
+
+    return topUsers;
+  }
+
+  public List<Object[]> TopUsersWithMostComments() {
+    HashMap<String, Long> userTime = new HashMap<>();
+    List<Comment> comments = commentRepository.findAll();
+    for (Comment c : comments) {
+      Owner owner = c.getOwner();
+      String s = owner.getDisplayName() + "(" + owner.getUserId() + ")";
+      userTime.put(s, userTime.getOrDefault(s, 0L) + 1);
+    }
+
+    List<Object[]> topUsers = getTopUsers(userTime);
+
+    return topUsers;
+  }
+
+  @NotNull
+  private static List<Object[]> getTopUsers(HashMap<String, Long> userTime) {
+    // 使用HashMap的entrySet创建流，然后对流中的元素按照value进行排序
+    List<Map.Entry<String, Long>> sortedEntries = userTime.entrySet()
+        .stream()
+        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+        .toList();
+
+    // 获取前十名的entry对象
+    List<Map.Entry<String, Long>> topEntries = sortedEntries.stream()
+        .limit(10)
+        .toList();
+
+    // 转换为List<Object[]>形式返回
+    List<Object[]> topUsers = topEntries.stream()
+        .map(entry -> new Object[]{entry.getKey(), entry.getValue()})
+        .collect(Collectors.toList());
+    return topUsers;
+  }
+
+  private String getUserRange(long postTime) {
+    if (postTime <= 1) {
+      return "#1: only 1 post";
+    } else if (postTime <= 2) {
+      return "#2: only 2 post";
+    } else if (postTime <= 5) {
+      return "#3: 3-5 posts";
+    } else if (postTime <= 10) {
+      return "#4: 6-10 posts";
+    } else if (postTime <= 30) {
+      return "#5: 11-30 posts";
+    } else {
+      return "#6 more than 30 posts";
+    }
+  }
+
+
+  public List<Answer> getAnswersBy(Boolean isAccepted, Integer questionId) {
+    // 根据需要构建查询条件
+    return answerRepository.getFilteredAnswers(isAccepted, questionId);
+  }
+
+  public List<Question> getFilteredQuestions(Boolean isAnswered, Integer id) {
+    return questionRepository.getFilteredQuestions(isAnswered, id);
   }
 
 

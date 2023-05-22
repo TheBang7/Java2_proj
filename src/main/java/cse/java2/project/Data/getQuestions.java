@@ -17,37 +17,38 @@ public class getQuestions {
   public static void main(String[] args) throws IOException {
     OkHttpClient client = new OkHttpClient();
 
-    String baseUrl = "https://api.stackexchange.com/2.3/questions?page=%d&pagesize=100&order=desc&sort=activity&tagged=java&site=stackoverflow&filter=!-L(Ygem0meScMk5U8(qnhwMZzZdrn8A-6";
+    String baseUrl = "https://api.stackexchange.com/2.3/questions?page=%d&pagesize=100&order=desc&sort=activity&tagged=java&site=stackoverflow&filter=!*MjkmySTGkT79B1I";
 
     int currentPage = 1;
     int totalQuestions = 0;
 
     List<Question> questions = new ArrayList<>();
     try (FileWriter file = new FileWriter("test.json")) {
-    while (true) {
-      String url = String.format(baseUrl, currentPage);
-      Request request = new Request.Builder().url(url).build();
+      while (true) {
+        String url = String.format(baseUrl, currentPage);
+        Request request = new Request.Builder().url(url).build();
 
-      try (Response response = client.newCall(request).execute()) {
-        String responseBody = null;
-        if (response.body() != null) {
-          responseBody = response.body().string();
+        try (Response response = client.newCall(request).execute()) {
+          String responseBody = null;
+          if (response.body() != null) {
+            responseBody = response.body().string();
+          }
+
+          Gson gson = new Gson();
+          StackExchangeResponse stackExchangeResponse = gson.fromJson(responseBody,
+              StackExchangeResponse.class);
+
+          List<Question> pageQuestions = stackExchangeResponse.getQuestions();
+          if (pageQuestions == null || pageQuestions.isEmpty()) {
+            break;
+          }
+          totalQuestions += pageQuestions.size();
+
+          questions.addAll(pageQuestions);
+          currentPage++;
         }
-
-        Gson gson = new Gson();
-        StackExchangeResponse stackExchangeResponse = gson.fromJson(responseBody,
-            StackExchangeResponse.class);
-
-        List<Question> pageQuestions = stackExchangeResponse.getQuestions();
-        if (pageQuestions == null || pageQuestions.isEmpty()) {
-          break;
-        }
-        totalQuestions += pageQuestions.size();
-
-        questions.addAll(pageQuestions);
-        currentPage++;
       }
-    }}
+    }
 
     System.out.println("Total questions: " + questions.size());
 
@@ -57,14 +58,16 @@ public class getQuestions {
     writer.write(json);
     writer.close();
   }
-}
 
-class StackExchangeResponse {
+  static class StackExchangeResponse {
 
-  @SerializedName("items")
-  private List<Question> questions;
+    @SerializedName("items")
+    private List<Question> questions;
 
-  public List<Question> getQuestions() {
-    return questions;
+    public List<Question> getQuestions() {
+      return questions;
+    }
   }
 }
+
+

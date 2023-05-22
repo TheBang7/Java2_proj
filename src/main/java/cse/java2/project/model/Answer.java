@@ -21,6 +21,10 @@ public class Answer {
   @SerializedName("answer_id")
   private int id;
 
+  @Column(name = "body", columnDefinition = "text")
+  @SerializedName("body")
+  private String body;
+
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "owner_user_id")
   @SerializedName("owner")
@@ -33,6 +37,10 @@ public class Answer {
   @Column(name = "score")
   @SerializedName("score")
   private int score;
+
+  @Column(name = "comment_count")
+  @SerializedName("comment_count")
+  private int commentCount;
 
   @Column(name = "last_activity_date")
   @SerializedName("last_activity_date")
@@ -66,6 +74,38 @@ public class Answer {
   // Constructors, getters, and setters
 
   // Convert ownerId to Owner object after deserialization
+
+  public String getBody() {
+    return body;
+  }
+
+  public void setBody(String body) {
+    this.body = body;
+  }
+
+  public int getCommentCount() {
+    return commentCount;
+  }
+
+  public void setCommentCount(int commentCount) {
+    this.commentCount = commentCount;
+  }
+
+  public List<String> getTags() {
+    return tags;
+  }
+
+  public void setTags(List<String> tags) {
+    this.tags = tags;
+  }
+
+  public int getUpVoteCount() {
+    return upVoteCount;
+  }
+
+  public void setUpVoteCount(int upVoteCount) {
+    this.upVoteCount = upVoteCount;
+  }
 
   public int getId() {
     return id;

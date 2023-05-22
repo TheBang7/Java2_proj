@@ -39,6 +39,8 @@ public class Application implements WebMvcConfigurer {
   public void addViewControllers(ViewControllerRegistry registry) {
     registry.addViewController("/demo").setViewName("demo");
     registry.addViewController("/answer").setViewName("answer");
+
+
   }
 
 }

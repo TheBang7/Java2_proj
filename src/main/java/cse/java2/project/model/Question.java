@@ -26,6 +26,10 @@ public class Question {
   @SerializedName("owner")
   private Owner owner;
 
+  @Column(name = "body", columnDefinition = "text")
+  @SerializedName("body")
+  private String body;
+
   @Column(name = "is_answered")
   @SerializedName("is_answered")
   private boolean isAnswered;
@@ -37,6 +41,10 @@ public class Question {
   @Column(name = "answer_count")
   @SerializedName("answer_count")
   private int answerCount;
+
+  @Column(name = "comment_count")
+  @SerializedName("comment_count")
+  private int commentCount;
 
   @Column(name = "score")
   @SerializedName("score")
@@ -79,6 +87,22 @@ public class Question {
 
   // Convert tagNames to Tag objects after deserialization
 
+
+  public String getBody() {
+    return body;
+  }
+
+  public void setBody(String body) {
+    this.body = body;
+  }
+
+  public int getCommentCount() {
+    return commentCount;
+  }
+
+  public void setCommentCount(int commentCount) {
+    this.commentCount = commentCount;
+  }
 
   public int getUpVoteCount() {
     return upVoteCount;
@@ -193,39 +217,4 @@ public class Question {
   }
 }
 
-@Entity
-@Table(name = "owner")
-class Owner {
-
-  @Id
-  @Column(name = "user_id")
-  @SerializedName("user_id")
-  private int userId;
-
-  @Column(name = "account_id")
-  @SerializedName("account_id")
-  private int accountId;
-
-  @Column(name = "reputation")
-  @SerializedName("reputation")
-  private int reputation;
-
-  @Column(name = "user_type")
-  @SerializedName("user_type")
-  private String userType;
-
-  @Column(name = "profile_image")
-  @SerializedName("profile_image")
-  private String profileImage;
-
-  @Column(name = "display_name")
-  @SerializedName("display_name")
-  private String displayName;
-
-  @Column(name = "link")
-  @SerializedName("link")
-  private String link;
-
-  // Constructors, getters, and setters
-}
 

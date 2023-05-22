@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Answer Page</title>
+  <!-- 引入需要的图表库 -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.27.3/dist/apexcharts.min.js"></script>
+  <style>
+    .chart-container {
+      width: 400px;
+      height: 400px;
+      margin: auto;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+  </style>
+
+</head>
+<body>
+<h1>Some Introduction to StackOverFlow —— tags</h1>
+
+<h2>Top 10 Tags exist with "java!"</h2>
+<div id="tagCountChart" class="chart-container"></div>
+
+<h2>Top 10 Tags Combinations with most upvote"</h2>
+<div id="topTagsWithUpvoteChart" class="chart-container"></div>
+
+<h2>Top 10 Tags Combinations with most view"</h2>
+<div id="topTagsWithViewChart" class="chart-container"></div>
+
+<script th:inline="javascript">
+  // 获取后端传递过来的数据
+
+
+  var tagCounts = /*[[${topTenTagsWithCount}]]*/ [];
+
+  // 提取标签和出现次数的数据
+  var labels = tagCounts.map(function (tagData) {
+    return tagData.tag;
+  });
+
+  var data = tagCounts.map(function (tagData) {
+    return tagData.count;
+  });
+
+  // 创建柱状图展示出现最多的标签及其出现次数
+  var tagCountChart = new ApexCharts(document.querySelector("#tagCountChart"), {
+    series: [{
+      name: "Tag Count",
+      data: data
+    }],
+    chart: {
+      type: "bar",
+      height: 300,
+      width: 600
+    },
+    xaxis: {
+      categories: labels
+    }
+  });
+  tagCountChart.render();
+
+  var topTagsWithUpvote = /*[[${topTagsWithUpvote}]]*/ [];
+
+  var tagCombination = topTagsWithUpvote.map(function(item) {
+    return item[0];
+  });
+  var voteCount = topTagsWithUpvote.map(function(item) {
+    return item[1];
+  });
+
+  var topTagsWithUpvoteChart = new ApexCharts(document.querySelector("#topTagsWithUpvoteChart"),
+      {
+        series: [{
+          name: 'Upvotes',
+          data: voteCount
+        }],
+        chart: {
+          type: 'bar',
+          height: 300
+        },
+        xaxis: {
+          categories: tagCombination
+        },
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }]
+      });
+  topTagsWithUpvoteChart.render();
+
+  var topTagsWithView = /*[[${topTagsWithView}]]*/ [];
+
+  var tagCombination2 = topTagsWithView.map(function(item) {
+    return item[0];
+  });
+  var voteCount2 = topTagsWithView.map(function(item) {
+    return item[1];
+  });
+
+  var topTagsWithViewChart = new ApexCharts(document.querySelector("#topTagsWithViewChart"),
+      {
+        series: [{
+          name: 'Upvotes',
+          data: voteCount2
+        }],
+        chart: {
+          type: 'bar',
+          height: 300
+        },
+        xaxis: {
+          categories: tagCombination2
+        },
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }]
+      });
+  topTagsWithViewChart.render();
+
+</script>
+</body>
+
+</html>
