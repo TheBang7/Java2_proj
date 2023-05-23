@@ -43,7 +43,7 @@ public class AnswerController {
 
     double percentageOfQuestionWithAcceptedAnswer = questionService.getPercentageOfQuestionWithAcceptedAnswer();
     model.addAttribute("percentageOfQuestionWithAcceptedAnswer",
-        percentageOfQuestionWithAcceptedAnswer);//What percentage of questions have accepted answers
+        percentageOfQuestionWithAcceptedAnswer); //What percentage of questions have accepted answers
 
     Map<String, Integer> distributionOfAnswerTime = questionService.getDistributionOfAnswerTime();
     model.addAttribute("distributionOfAnswerTime", distributionOfAnswerTime);

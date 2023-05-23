@@ -29,7 +29,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
   List<Object[]> numberOfAnswersDistribution();
 
   @Query("SELECT COUNT(q) FROM Question q WHERE q.isAnswered=true ")
-  long countQuestionsWithAcceptedAnswer();//What percentage of questions have accepted answers
+  long countQuestionsWithAcceptedAnswer(); //What percentage of questions have accepted answers
 
   @Query("SELECT q.creationDate, COUNT(q) FROM Question q GROUP BY q.answerCount  order by q.answerCount")
   List<Object[]> QuestionSolvedTimeDistribution();

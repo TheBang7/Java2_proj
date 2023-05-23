@@ -5,7 +5,6 @@ import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import cse.java2.project.model.Answer;
