@@ -94,6 +94,17 @@ public class AnswerController {
 
   }
 
+  @GetMapping("/bonus")
+  public String bonus(Model model) {
+
+    List<Object[]> topClassAndMethod = questionService.BonusTopClass();
+    model.addAttribute("topClassAndMethod", topClassAndMethod);
+
+
+    return "bonus";
+
+  }
+
 
 }
 

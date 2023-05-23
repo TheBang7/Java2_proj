@@ -1,6 +1,7 @@
 package cse.java2.project.controller;
 
 import cse.java2.project.model.Answer;
+import cse.java2.project.model.Comment;
 import cse.java2.project.model.Question;
 import cse.java2.project.service.QuestionAndAnswerService;
 import java.util.List;
@@ -31,6 +32,14 @@ public class AnswerRestController {
       @RequestParam(value = "id", required = false) Integer id) {
     return questionService.getFilteredQuestions(isAnswered, id);
   }
+
+  @GetMapping("/json/comments")
+  public List<Comment> getFilteredComments(
+      @RequestParam(value = "postId", required = false)Integer postId,
+      @RequestParam(value = "id", required = false) Integer id) {
+    return questionService.getFilteredComments(postId, id);
+  }
+
 
 
 }

@@ -1,5 +1,10 @@
 package cse.java2.project.service;
 
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseResult;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -18,10 +23,13 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -222,6 +230,7 @@ public class QuestionAndAnswerService {
     HashMap<String, Long> userTime = new HashMap<>();
     List<Question> questions = questionRepository.findAll();
     List<Answer> answers = answerRepository.findAll();
+    List<Comment> comments = commentRepository.findAll();
     for (Question q : questions) {
       Owner owner = q.getOwner();
       String s = owner.getDisplayName() + "(" + owner.getUserId() + ")";
@@ -233,7 +242,6 @@ public class QuestionAndAnswerService {
       userTime.put(s, userTime.getOrDefault(s, 0L) + 1);
     }
 
-    List<Comment> comments = commentRepository.findAll();
     for (Comment c : comments) {
       Owner owner = c.getOwner();
       String s = owner.getDisplayName() + "(" + owner.getUserId() + ")";
@@ -338,6 +346,60 @@ public class QuestionAndAnswerService {
 
   public List<Question> getFilteredQuestions(Boolean isAnswered, Integer id) {
     return questionRepository.getFilteredQuestions(isAnswered, id);
+  }
+
+
+  public List<Comment> getFilteredComments(Integer postId, Integer id) {
+    return commentRepository.getFilteredComments(postId, id);
+  }
+
+  public List<Object[]> BonusTopClass() {
+    HashMap<String, Long> classAndMethodCount = new HashMap<>();
+    List<String> strings = new ArrayList<>();
+
+    // 将问题、答案和评论的内容添加到strings列表中
+    List<Question> questions = questionRepository.findAll();
+    List<Answer> answers = answerRepository.findAll();
+    List<Comment> comments = commentRepository.findAll();
+
+    for (Question q : questions) {
+      strings.add(q.getBody());
+    }
+    for (Answer a : answers) {
+      strings.add(a.getBody());
+    }
+    for (Comment c : comments) {
+      strings.add(c.getBody());
+    }
+
+    // 提取类名和方法名并统计出现次数
+    for (String content : strings) {
+      String regex = "\\b(?:class|interface)\\s+([A-Z][\\w$]*)\\b|\\b(?:public\\s+|private\\s+|protected\\s+)?(?:static\\s+)?\\w+\\s+([\\w$]+)\\s*\\(";
+      Pattern pattern = Pattern.compile(regex);
+      Matcher matcher = pattern.matcher(content);
+
+      while (matcher.find()) {
+        String className = matcher.group(1);
+        String methodName = matcher.group(2);
+
+        if (className != null) {
+          classAndMethodCount.put(className, classAndMethodCount.getOrDefault(className, 0L) + 1);
+        } else if (methodName != null) {
+          classAndMethodCount.put(methodName, classAndMethodCount.getOrDefault(methodName, 0L) + 1);
+        }
+      }
+    }
+
+    // 根据出现次数排序并获取前20个
+    List<Object[]> topClassAndMethodList = new ArrayList<>();
+    classAndMethodCount.entrySet()
+        .stream()
+        .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+        .limit(20)
+        .forEach(
+            entry -> topClassAndMethodList.add(new Object[]{entry.getKey(), entry.getValue()}));
+
+    return topClassAndMethodList;
   }
 
 

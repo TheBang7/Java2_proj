@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Answer Page</title>
+  <!-- 引入需要的图表库 -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.27.3/dist/apexcharts.min.js"></script>
+  <style>
+    .chart-container {
+      width: 600px;
+      height: 600px;
+      margin: auto;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+
+  </style>
+
+</head>
+<body>
+<h1>Some Introduction to StackOverFlow——Top Class And Method</h1>
+
+<h2>Top 10 Class And Method"</h2>
+<div id="topClassAndMethodChart" class="chart-container"></div>
+
+
+<script th:inline="javascript">
+  // 获取后端传递过来的数据
+  //topClassAndMethod
+  var topClassAndMethod = /*[[${topClassAndMethod}]]*/ [];
+
+  var tagCombination3 =topClassAndMethod.map(function (item) {
+    return item[0];
+  });
+  var voteCount3 = topClassAndMethod.map(function (item) {
+    return item[1];
+  });
+
+  var topClassAndMethodChart = new ApexCharts(
+      document.querySelector("#topClassAndMethodChart"),
+      {
+        series: [{
+          name: 'appear times',
+          data: voteCount3
+        }],
+        chart: {
+          type: 'bar',
+          height: 300
+        },
+        xaxis: {
+          categories: tagCombination3
+        },
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }]
+      });
+  topClassAndMethodChart.render();
+
+
+</script>
+</body>
+
+</html>
