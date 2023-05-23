@@ -185,11 +185,14 @@ public class QuestionAndAnswerService {
 
     for (Question question : questions) {
       List<String> tags = questionRepository.getTagsByQuestionId(question.getId());
+      tags.remove("java");
       tags.sort(String::compareTo);
-      String tag = tags.toString();
-      System.out.println(tag);
-
-      map.put(tag, map.getOrDefault(tag, 0) + question.getUpVoteCount());
+      for (int i = 0; i < tags.size(); i++) {
+        for (int j = i + 1; j < tags.size(); j++) {
+          String tag = "java," +tags.get(i) + "," + tags.get(j);
+          map.put(tag, map.getOrDefault(tag, 0) + question.getUpVoteCount());
+        }
+      }
     }
 
     List<Object[]> topTags = map.entrySet()
@@ -208,11 +211,14 @@ public class QuestionAndAnswerService {
 
     for (Question question : questions) {
       List<String> tags = questionRepository.getTagsByQuestionId(question.getId());
+      tags.remove("java");
       tags.sort(String::compareTo);
-      String tag = tags.toString();
-      System.out.println(tag);
-
-      map.put(tag, map.getOrDefault(tag, 0) + question.getViewCount());
+      for (int i = 0; i < tags.size(); i++) {
+        for (int j = i + 1; j < tags.size(); j++) {
+          String tag = "java," + tags.get(i) + "," + tags.get(j);
+          map.put(tag, map.getOrDefault(tag, 0) + question.getViewCount());
+        }
+      }
     }
 
     List<Object[]> topTags = map.entrySet()
